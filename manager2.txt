@@ -1,0 +1,648 @@
+package work;
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import java.awt.Color;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
+import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.awt.event.ActionEvent;
+import javax.swing.JTabbedPane;
+import java.awt.SystemColor;
+import javax.swing.JRadioButton;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JToggleButton;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
+import java.awt.Component;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
+
+public class design {
+
+	private JFrame mainframe;
+	private JTextField txtf_sname;
+	private JTextField txtf_enrolnumbr;
+	private JTextField txtf_ttlattend;
+	private JTextField txtf_ttlclass;
+	private JToggleButton tglbtn_makechanges;
+	private JRadioButton rdbtn_takeattend;
+	private JButton btn_present;
+	private JButton btn_absent;
+	private JTabbedPane tbbdpane_makechanges;
+	private JPanel panel_addnews;
+	private JPanel panel_removes;
+	private JLabel addnew_name;
+	private JLabel addnew_enrollnumber;
+	private JLabel addnew_attend;
+	private JTextField addnew_nametxt;
+	private JTextField addnew_enrolltxt;
+	private JTextField addnew_attendtxt;
+	private JTextField remove_txtf;
+	private JButton remove_btn;
+	private JButton addnew_btn;
+	private JButton btnNewButton;
+	private Connection conn;
+	private JTextField addnew_clstxt;
+	private JLabel addnew_ttlclass;
+	private ResultSet rs;
+	private PreparedStatement pst;
+	private String a;
+	private String b;
+	private String c;
+	private String d;
+	private JComboBox<String> list;
+	private Statement st;
+	private int atnd;
+	private int cls;
+	private int row;
+	
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					design window = new design();
+					window.mainframe.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public design() {
+		initialize();
+		Actions();
+		dbms();
+	}
+	
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		
+		mainframe = new JFrame("MyAttendenceManager");
+		mainframe.getContentPane().setBackground(new Color(0, 0, 128));
+		mainframe.setBounds(100, 100, 822, 568);
+		mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainframe.getContentPane().setLayout(null);
+	    mainframe.setResizable(false);
+		
+		
+		JPanel panel = new JPanel();
+		panel.setOpaque(false);
+		panel.setBorder(null);
+		panel.setBackground(new Color(0, 0, 128));
+		panel.setBounds(43, 274, 327, 206);
+		mainframe.getContentPane().add(panel);
+		
+		tbbdpane_makechanges = new JTabbedPane(JTabbedPane.TOP);
+		tbbdpane_makechanges.setOpaque(false);
+		tbbdpane_makechanges.setEnabled(false);
+		tbbdpane_makechanges.setVisible(false);
+		GroupLayout gl_panel = new GroupLayout(panel);
+		gl_panel.setHorizontalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addComponent(tbbdpane_makechanges, GroupLayout.PREFERRED_SIZE, 327, GroupLayout.PREFERRED_SIZE)
+		);
+		gl_panel.setVerticalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addComponent(tbbdpane_makechanges, GroupLayout.PREFERRED_SIZE, 206, GroupLayout.PREFERRED_SIZE)
+		);
+		
+		panel_addnews = new JPanel();
+		panel_addnews.setOpaque(false);
+		tbbdpane_makechanges.addTab("ADD NEW STUDENT", null, panel_addnews, null);
+		panel_addnews.setLayout(null);
+		
+		JLabel lblEnterDetails = new JLabel("Enter Details");
+		lblEnterDetails.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblEnterDetails.setBounds(10, 11, 99, 14);
+		panel_addnews.add(lblEnterDetails);
+		
+		addnew_name = new JLabel("Name");
+		addnew_name.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		addnew_name.setBounds(10, 46, 46, 14);
+		panel_addnews.add(addnew_name);
+		
+		addnew_enrollnumber = new JLabel("Enrollment Number");
+		addnew_enrollnumber.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		addnew_enrollnumber.setBounds(10, 71, 117, 14);
+		panel_addnews.add(addnew_enrollnumber);
+		
+		addnew_attend = new JLabel("Attendence");
+		addnew_attend.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		addnew_attend.setBounds(10, 95, 78, 14);
+		panel_addnews.add(addnew_attend);
+		
+		addnew_btn = new JButton("Add Student");
+		addnew_btn.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		addnew_btn.setBounds(50, 144, 111, 23);
+		panel_addnews.add(addnew_btn);
+		
+		addnew_nametxt = new JTextField();
+		addnew_nametxt.setBounds(159, 44, 130, 20);
+		panel_addnews.add(addnew_nametxt);
+		addnew_nametxt.setColumns(10);
+		
+		addnew_enrolltxt = new JTextField();
+		addnew_enrolltxt.setBounds(159, 69, 130, 20);
+		panel_addnews.add(addnew_enrolltxt);
+		addnew_enrolltxt.setColumns(10);
+		
+		addnew_attendtxt = new JTextField();
+		addnew_attendtxt.setBounds(159, 93, 86, 20);
+		panel_addnews.add(addnew_attendtxt);
+		addnew_attendtxt.setColumns(10);
+		
+		addnew_ttlclass = new JLabel("Total Classes");
+		addnew_ttlclass.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		addnew_ttlclass.setBounds(10, 116, 78, 14);
+		panel_addnews.add(addnew_ttlclass);
+		
+		addnew_clstxt = new JTextField();
+		addnew_clstxt.setBounds(159, 113, 86, 20);
+		panel_addnews.add(addnew_clstxt);
+		addnew_clstxt.setColumns(10);
+		
+		panel_removes = new JPanel();
+		panel_removes.setOpaque(false);
+		tbbdpane_makechanges.addTab("REMOVE STUDENT", null, panel_removes, null);
+		panel_removes.setLayout(null);
+		
+		JLabel lblEnterEnrollmentNumber = new JLabel("Enter Enrollment Number");
+		lblEnterEnrollmentNumber.setForeground(Color.BLACK);
+		lblEnterEnrollmentNumber.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblEnterEnrollmentNumber.setBounds(10, 26, 189, 26);
+		panel_removes.add(lblEnterEnrollmentNumber);
+		
+		remove_txtf = new JTextField();
+		remove_txtf.setBounds(10, 63, 166, 20);
+		panel_removes.add(remove_txtf);
+		remove_txtf.setColumns(10);
+		
+		remove_btn = new JButton("Remove Student");
+		remove_btn.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		remove_btn.setBounds(10, 98, 146, 26);
+		panel_removes.add(remove_btn);
+		panel.setLayout(gl_panel);
+		panel.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tbbdpane_makechanges}));
+		
+		txtf_sname = new JTextField();
+		txtf_sname.setBounds(414, 123, 197, 39);
+		mainframe.getContentPane().add(txtf_sname);
+		txtf_sname.setColumns(10);
+		txtf_sname.setEditable(false);
+		
+		JLabel lbl_sname = new JLabel("STUDENTS NAME");
+		lbl_sname.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lbl_sname.setForeground(new Color(255, 250, 250));
+		lbl_sname.setBounds(414, 92, 149, 20);
+		mainframe.getContentPane().add(lbl_sname);
+		
+		JLabel lbl_enrolnumbr = new JLabel("ENROLLMENT NUMBER");
+		lbl_enrolnumbr.setForeground(SystemColor.text);
+		lbl_enrolnumbr.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lbl_enrolnumbr.setBounds(414, 192, 197, 15);
+		mainframe.getContentPane().add(lbl_enrolnumbr);
+		
+		txtf_enrolnumbr = new JTextField();
+		txtf_enrolnumbr.setBounds(414, 218, 149, 29);
+		mainframe.getContentPane().add(txtf_enrolnumbr);
+		txtf_enrolnumbr.setColumns(10);
+		txtf_enrolnumbr.setEditable(false);
+		
+		
+		JLabel lbl_heading = new JLabel("ATTENDENCE MANAGER");
+		lbl_heading.setForeground(SystemColor.text);
+		lbl_heading.setFont(new Font("Tahoma", Font.PLAIN, 25));
+		lbl_heading.setBounds(216, 11, 349, 57);
+		mainframe.getContentPane().add(lbl_heading);
+		
+		btn_present = new JButton("PRESENT");
+	    btn_present.setBounds(414, 402, 89, 23);
+		mainframe.getContentPane().add(btn_present);
+		btn_present.setEnabled(false);
+		
+		btn_absent = new JButton("ABSENT");
+		btn_absent.setBounds(536, 402, 89, 23);
+		mainframe.getContentPane().add(btn_absent);
+		btn_absent.setEnabled(false);
+		
+		JLabel lbl_ttlatttend = new JLabel("TOTAL ATTENDENCE");
+		lbl_ttlatttend.setForeground(SystemColor.text);
+		lbl_ttlatttend.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lbl_ttlatttend.setBounds(414, 268, 158, 29);
+		mainframe.getContentPane().add(lbl_ttlatttend);
+		
+		txtf_ttlattend = new JTextField();
+		txtf_ttlattend.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		txtf_ttlattend.setBounds(586, 274, 86, 20);
+		mainframe.getContentPane().add(txtf_ttlattend);
+		txtf_ttlattend.setColumns(10);
+		txtf_ttlattend.setEditable(false);
+		
+		
+		JLabel lbl_ttlclass = new JLabel("TOTAL CLASSES");
+		lbl_ttlclass.setForeground(SystemColor.text);
+		lbl_ttlclass.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lbl_ttlclass.setBounds(414, 308, 131, 14);
+		mainframe.getContentPane().add(lbl_ttlclass);
+		
+		txtf_ttlclass = new JTextField();
+		txtf_ttlclass.setBounds(586, 307, 89, 20);
+		mainframe.getContentPane().add(txtf_ttlclass);
+		txtf_ttlclass.setColumns(10);
+		txtf_ttlclass.setEditable(false);
+		
+		rdbtn_takeattend = new JRadioButton("TAKE ATTENDENCE");
+	    rdbtn_takeattend.setBounds(414, 354, 149, 23);
+		mainframe.getContentPane().add(rdbtn_takeattend);
+		
+		tglbtn_makechanges = new JToggleButton("MAKE CHANGES");
+		tglbtn_makechanges.setBounds(43, 221, 131, 29);
+		mainframe.getContentPane().add(tglbtn_makechanges);
+		
+		btnNewButton = new JButton("previous");
+		
+		btnNewButton.setBounds(414, 457, 89, 23);
+		mainframe.getContentPane().add(btnNewButton);
+		
+		list = new JComboBox<String>();
+		list.setOpaque(false);
+		list.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		list.setEditable(true);
+		//list.setAutoscrolls(true);
+		list.setBounds(38, 104, 158, 29);
+		mainframe.getContentPane().add(list);
+		
+		JLabel bg_image = new JLabel("New label");
+		bg_image.setIcon(new ImageIcon(design.class.getResource("/views/stars.jpg")));
+		bg_image.setBounds(0,0,816,529);
+		mainframe.getContentPane().add(bg_image);
+		mainframe.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{panel, tbbdpane_makechanges, txtf_sname, lbl_sname, lbl_enrolnumbr, txtf_enrolnumbr, lbl_heading, btn_present, btn_absent, lbl_ttlatttend, txtf_ttlattend, lbl_ttlclass, txtf_ttlclass, rdbtn_takeattend, tglbtn_makechanges}));
+		btnNewButton.setVisible(true);
+
+	
+	
+	
+	}
+	
+	
+	
+	////////////////////////////////////////////////////////////////////
+	///ACTIONS
+	/////////////////////////////////////////////////////////////////
+	
+	
+	
+	private void Actions(){
+		
+		addnew_btn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if((addnew_nametxt.getText()).length()>0){
+					if((addnew_attendtxt.getText()).length()>0){         		
+									if((addnew_enrolltxt.getText()).length()>0){
+											if((addnew_clstxt.getText()).length()>0){
+												a=addnew_nametxt.getText();
+												c=addnew_attendtxt.getText();
+												b=addnew_enrolltxt.getText();
+												d=addnew_clstxt.getText();
+												int o=JOptionPane.showConfirmDialog(null, "Do you want to  add \n name: "+a+"\n enrollment number: "+b+" \n attendence: "+c+ " \n classes: " +d+ "\n");
+				   
+					         						if(o==0){
+					         							
+					                                       enterData();
+					         								}
+											}
+											else{
+												JOptionPane.showMessageDialog(null, "Enter total classes!!");
+											}
+					         		}
+					         		else{
+					         			JOptionPane.showMessageDialog(null, "Enter Enrollment Number!!");
+					         		}
+					}
+					else{
+		     			JOptionPane.showMessageDialog(null, "Enter Attendence!!");
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Enter Name!!");
+				}
+			}
+		});
+		
+		remove_btn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if((remove_txtf.getText()).length()>0)
+				{
+	               a=remove_txtf.getText();
+				   int o=JOptionPane.showConfirmDialog(null,"do you want to remove "+a);
+					 
+				      if(o==0)
+				      {
+				    	  try{
+				    		  pst=conn.prepareStatement("delete from students where student_enroll=?");
+				    		  pst.setString(1,a);
+				    		  int y=pst.executeUpdate();
+				    		  if(y==1){
+					    	    JOptionPane.showMessageDialog(null, a+" Succesfully Removed");
+					    	    remove_txtf.setText("");
+					    	    
+					    	    list.removeAllItems();
+					    	    rs=st.executeQuery("Select s.* from students s");
+					    		while(rs.next()){
+					    			list.addItem(rs.getString(1));
+					    			}
+					    		rs.beforeFirst();
+					    		moveahead();
+				    		  }
+				    	  }
+				    	  catch(SQLException del){
+				    		  JOptionPane.showMessageDialog(null, "sql error in deleting"+del);
+				    	  }
+				    	 
+					  }
+					
+				}
+				else{
+					JOptionPane.showMessageDialog(null, "enter enrollment number");
+				}
+			}
+		});
+		
+		rdbtn_takeattend.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(rdbtn_takeattend.isSelected())
+				{
+
+					btn_absent.setEnabled(true);
+					btn_present.setEnabled(true);
+				}
+				else{
+
+					btn_absent.setEnabled(false);
+					btn_present.setEnabled(false);
+				}
+			}
+		   });
+		
+		
+		tglbtn_makechanges.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				if(tglbtn_makechanges.isSelected())
+				{
+
+					tbbdpane_makechanges.setEnabled(true);
+					tbbdpane_makechanges.setVisible(true);
+				}
+				else{
+
+					tbbdpane_makechanges.setEnabled(false);
+					tbbdpane_makechanges.setVisible(false);
+				}
+			}
+		});
+		
+		btn_present.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+					present();
+                    moveahead();			
+				
+				
+	 	}
+		});
+	
+		
+		
+		btn_absent.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+				cls=cls+1;
+				rs.updateInt(4, cls);
+				rs.updateRow();
+				moveahead();
+				}
+				catch(SQLException aa){
+					JOptionPane.showMessageDialog(null,"sql error"+aa);
+					
+				}
+			}
+		});
+		
+	
+		
+		list.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			   
+				String name=(String) list.getSelectedItem();
+				try{
+				rs.beforeFirst();
+				while(rs.next()){
+				   if((rs.getString(1)).equalsIgnoreCase(name)){
+					   setData();
+				        row=rs.getRow(); 
+				   }
+				   
+				}
+				rs.absolute(row);
+				}
+				catch(SQLException aaa){
+					JOptionPane.showMessageDialog(null, "SQL ERROR!!"+aaa);
+				}
+			}
+		});
+		
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				moveback();
+			}
+		});
+		
+		
+	}
+
+	
+	
+	
+
+	///////////////////////////////////////////////////////////////////////////////////////
+	//////////functions
+	/////////////////////////////////////////////////////////////////////////////////////
+	protected void present() {
+		cls=cls+1;
+		atnd=atnd+1;
+		try{
+		rs.updateInt(3, atnd);
+		rs.updateInt(4,cls);
+		rs.updateRow();
+		}
+		catch(SQLException ab){
+			JOptionPane.showMessageDialog(null, "SQL ERROR!!"+ab);
+		}
+	}
+	
+	
+	
+	protected void moveahead(){
+		try{
+		if(rs.next()){
+		
+			a=rs.getString(1);
+			txtf_sname.setText(a);
+			b=rs.getString(2);
+			txtf_enrolnumbr.setText(b);
+			atnd=rs.getInt(3);
+			txtf_ttlattend.setText(Integer.toString(atnd));
+			cls=rs.getInt(4);
+			txtf_ttlclass.setText(Integer.toString(cls));
+		}
+		}
+		catch(SQLException ac){
+			JOptionPane.showMessageDialog(null, "SQL ERROR!!"+ac);
+		}
+		
+	}
+	
+ protected void enterData() {
+		// TODO Auto-generated method stub
+	 try{
+	 pst=conn.prepareStatement("insert into students values(?,?,?,?)");
+	 pst.setString(1,a);
+	 pst.setString(2,b);
+	 pst.setInt(3, Integer.parseInt(c));
+	 pst.setInt(4, Integer.parseInt(d));
+	 int x=pst.executeUpdate();
+		if(x==1)
+			{
+			addnew_nametxt.setText("");
+			addnew_attendtxt.setText("");
+			addnew_enrolltxt.setText("");
+			addnew_clstxt.setText("");
+			JOptionPane.showMessageDialog(null, "Record Succesfully Updated!!");
+			list.addItem(a);
+			rs=st.executeQuery("Select s.* from students s");
+			moveahead();
+			}
+	 }
+	 catch(SQLException sq){
+		 JOptionPane.showMessageDialog(null, "sql in excepption in enterng  data!!"+sq.getMessage());
+		 
+	 }
+	 }
+ 
+ 
+    protected void moveback(){
+    	try{
+    		if(rs.previous()){
+    		setData();	
+    		}
+    	
+    	}
+    	catch(SQLException ad){
+    		 JOptionPane.showMessageDialog(null, "sql in excepption in enterng  data!!"+ad);
+    		
+    	}
+    }
+    protected void setData(){
+    	try{
+    	a=rs.getString(1);
+		txtf_sname.setText(a);
+		b=rs.getString(2);
+		txtf_enrolnumbr.setText(b);
+		atnd=rs.getInt(3);
+		txtf_ttlattend.setText(Integer.toString(atnd));
+		cls=rs.getInt(4);
+		txtf_ttlclass.setText(Integer.toString(cls));
+    	}
+    	catch(SQLException ad){
+   		 JOptionPane.showMessageDialog(null, "sql in excepption in enterng  data!!"+ad);
+   		
+   	}
+    }
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////DBMS
+///////////////////////////////////////////////////////////////////////////////
+
+
+   private void dbms()
+  {
+    try
+    {
+    	Class.forName("oracle.jdbc.OracleDriver");
+		System.out.println("driver successfully loaded!!");
+		conn=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","testuser","testpass");
+		System.out.println("connection opened");
+		pst=conn.prepareStatement("create table students(Student_name varchar(25),Student_enroll varchar(20),Student_attend number(2),Student_classes number(2))");
+		pst.executeUpdate();
+		
+    }	   
+    catch(ClassNotFoundException ex)
+    {
+		System.out.println("cant locate the driver"+ex.getMessage());
+		System.exit(0);
+    } 
+    catch(SQLException sq)
+	{
+		System.out.println("sql exception; "+sq.getMessage());
+	}
+    try{
+    	st=conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
+		rs=st.executeQuery("Select s.* from students s");
+		while(rs.next()){
+		list.addItem(rs.getString(1));
+		}
+		rs.first();
+		a=rs.getString(1);
+		txtf_sname.setText(a);
+		b=rs.getString(2);
+		txtf_enrolnumbr.setText(b);
+		atnd=rs.getInt(3);
+		txtf_ttlattend.setText(Integer.toString(atnd));
+		cls=rs.getInt(4);
+		txtf_ttlclass.setText(Integer.toString(cls));
+		
+		
+		
+    }
+	catch(SQLException sq)
+	{
+		System.out.println("sql exception; "+sq.getMessage());
+	}
+
+
+
+}
+   
+   @Override
+   protected void finalize() throws Throwable {
+       conn.close();
+       super.finalize();
+   }
+}
+  
+
+   
